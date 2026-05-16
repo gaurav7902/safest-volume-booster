@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Volume Booster</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup-shell">
+      <header class="topbar">
+        <div>
+          <h1>Volume Booster</h1>
+          <p id="status">Ready</p>
+        </div>
+        <label class="switch" aria-label="Enable volume boost">
+          <input id="enabled" type="checkbox" checked>
+          <span></span>
+        </label>
+      </header>
+
+      <section class="meter" aria-label="Current volume boost">
+        <output id="boostValue" for="boost">100%</output>
+        <input id="boost" type="range" min="100" max="600" value="100" step="10">
+      </section>
+
+      <div class="presets" aria-label="Volume presets">
+        <button type="button" data-boost="100">100%</button>
+        <button type="button" data-boost="200">200%</button>
+        <button type="button" data-boost="400">400%</button>
+        <button type="button" data-boost="600">600%</button>
+      </div>
+
+      <footer class="actions">
+        <button id="reset" type="button">Reset</button>
+      </footer>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
