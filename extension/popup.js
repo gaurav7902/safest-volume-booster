@@ -67,6 +67,10 @@ function render() {
   enabledInput.checked = state.enabled;
   boostInput.value = state.boost;
   boostValue.value = `${state.enabled ? state.boost : 100}%`;
+  
+  const percentage = ((state.boost - 100) / 500) * 100;
+  boostInput.style.setProperty('--fill', `${percentage}%`);
+
   statusText.textContent = state.enabled && state.boost > 100 ? "Ready to boost" : "Boost is off";
 
   presetButtons.forEach((button) => {
