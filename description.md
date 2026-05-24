@@ -12,4 +12,4 @@ Features:
 
 **Privacy:** This extension stores only your local volume preference and enabled/disabled state in browser extension storage. It does not collect, transmit, sell, or share user data. It does not use analytics, tracking scripts, external API calls, or remote code.
 
-**Open source:** TODO: add the public GitHub repository URL.
+**Open source:** [GitHub repository](https://github.com/gaurav7902/safest-volume-booster)

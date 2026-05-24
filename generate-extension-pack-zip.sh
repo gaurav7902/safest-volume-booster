@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTPUT="extension.zip"
+OUTPUT="safest-volume-booster-extension.zip"
 
 if [[ ! -d "extension" ]]; then
     echo "Error: extension folder not found."
