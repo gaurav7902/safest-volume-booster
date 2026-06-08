@@ -2,6 +2,16 @@
 
 A single Manifest V3 browser extension that boosts audio and video elements up to 600%, including YouTube.
 
+## Quick Navigation
+
+- [Features](#features)
+- [Quick install](#quick-install)
+- [Use](#use)
+- [Privacy](#privacy)
+- [Packaging](#packaging)
+- [Author](#author)
+- [License](#license)
+
 ## Features
 
 - Boost page audio/video from 100% to 600%
@@ -10,24 +20,30 @@ A single Manifest V3 browser extension that boosts audio and video elements up t
 - Reset control to return to the default 100% volume
 - Local settings storage only
 
-## Chrome Install
+## Quick install
 
-Download `volume-booster-extension.zip` from the project release page, unzip it, then load the unpacked extension:
+### Firefox Install
 
-1. Open `chrome://extensions/`
-2. Enable **Developer mode**
-3. Click **Load unpacked**
-4. Select the unzipped `extension` folder
+Available on addon store :)
 
-## Firefox Install
+Click Here 👉
+[![Firefox](https://img.shields.io/badge/Firefox-Install-FF7139?logo=firefox&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/safest-volume-booster/)
 
-<!-- Firefox Add-ons link: **TODO: add AMO listing URL** -->
+### Microsoft Edge
 
-Download `volume-booster-extension.zip` from the project release page, unzip it, then load the unpacked extension:
+Available on Microsoft Edge Add-ons
 
-1. Open `about:debugging#/runtime/this-firefox`.
-2. Choose **Load Temporary Add-on...**.
-3. Select `extension/manifest.json`.
+Click Here 👉
+[![Edge](https://img.shields.io/badge/Edge-Install-0078D7?logo=microsoft-edge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/objjeliacgbldkachijminogkkdhceaf)
+
+### Chrome / Brave
+
+1. Download `codeforces-darktheme-extension.zip` from releases:  
+   [Releases](https://github.com/gaurav7902/safest-volume-booster/releases/tag/v1.0.0) or directly: [Zip download](https://github.com/gaurav7902/safest-volume-booster/releases/download/v1.0.0/safest-volume-booster-extension.zip)
+2. Unzip the file to a local folder.
+3. Open your Chromium-based browser (Chrome, Brave) and go to `chrome://extensions/` or `brave://extensions/` as appropriate.
+4. Enable "Developer mode" (top right).
+5. Click "Load unpacked" and select `manifest.json` from the unzipped folder.
 
 ## Use
 
