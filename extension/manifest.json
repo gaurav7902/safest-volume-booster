@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Volume Booster",
     "description": "Boost audio and video volume above the normal limit.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "permissions": ["activeTab", "scripting", "storage", "tabs"],
     "host_permissions": ["<all_urls>"],
     "content_scripts": [

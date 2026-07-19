@@ -14,18 +14,22 @@
         state: { ...DEFAULT_STATE },
         audioContext: null,
         mediaNodes: new WeakMap(),
+        playingElements: new Set(),
         observer: null,
         retryTimer: null,
     }
 
     init()
 
-    function init() {
-        getStorage(DEFAULT_STATE).then((saved) => {
+    async function init() {
+        try {
+            const saved = await getStorage(DEFAULT_STATE)
             booster.state = normalizeState(saved)
             startWatching()
             applyBoostToPage()
-        })
+        } catch (e) {
+            console.error('Volume Booster: Failed to initialize', e)
+        }
 
         chrome.runtime.onMessage.addListener(
             (message, _sender, sendResponse) => {
@@ -95,10 +99,14 @@
         const multiplier = booster.state.enabled ? booster.state.boost / 100 : 1
         const node = getOrCreateNode(media)
 
-        media.volume = 1
+        if (media.volume !== 1) {
+            media.volume = 1
+        }
 
         if (node) {
-            node.gain.gain.value = multiplier
+            if (node.gain.gain.value !== multiplier) {
+                node.gain.gain.value = multiplier
+            }
             return true
         }
 
@@ -122,21 +130,68 @@
                 booster.audioContext = new AudioContextClass()
             }
 
-            if (booster.audioContext.state === 'suspended') {
-                booster.audioContext.resume().catch(() => {})
-            }
-
             const source = booster.audioContext.createMediaElementSource(media)
             const gain = booster.audioContext.createGain()
 
             source.connect(gain)
-            gain.connect(booster.audioContext.destination)
 
             const node = { source, gain }
             booster.mediaNodes.set(media, node)
+
+            // Lifecycle listeners
+            const handlePlay = () => {
+                booster.playingElements.add(media)
+
+                // Fully reset the chain to avoid duplicate connections
+                try {
+                    node.source.disconnect()
+                    node.gain.disconnect()
+                } catch (e) {}
+
+                node.source.connect(node.gain)
+                node.gain.connect(booster.audioContext.destination)
+                updateAudioContextState()
+            }
+            const handlePause = () => {
+                booster.playingElements.delete(media)
+
+                // Completely break the audio chain to release the stream
+                try {
+                    node.source.disconnect()
+                    node.gain.disconnect()
+                } catch (e) {}
+
+                updateAudioContextState()
+            }
+
+            media.addEventListener('play', handlePlay)
+            media.addEventListener('pause', handlePause)
+            media.addEventListener('ended', handlePause)
+
+            // Sync initial state
+            if (!media.paused) {
+                handlePlay()
+            } else {
+                handlePause()
+            }
+
             return node
         } catch {
             return null
+        }
+    }
+
+    function updateAudioContextState() {
+        if (!booster.audioContext) return
+
+        if (booster.playingElements.size > 0) {
+            if (booster.audioContext.state === 'suspended') {
+                booster.audioContext.resume().catch(() => {})
+            }
+        } else {
+            if (booster.audioContext.state === 'running') {
+                booster.audioContext.suspend().catch(() => {})
+            }
         }
     }
 
@@ -156,13 +211,8 @@
         return `Boosting at ${booster.state.boost}%`
     }
 
-    function getStorage(defaults) {
-        return new Promise((resolve) => {
-            const result = chrome.storage.sync.get(defaults, resolve)
-            if (result && typeof result.then === 'function') {
-                result.then(resolve)
-            }
-        })
+    async function getStorage(defaults) {
+        return await chrome.storage.sync.get(defaults)
     }
 
     function normalizeState(value) {

@@ -67,7 +67,7 @@ function render() {
   enabledInput.checked = state.enabled;
   boostInput.value = state.boost;
   boostValue.value = `${state.enabled ? state.boost : 100}%`;
-  
+
   const percentage = ((state.boost - 100) / 500) * 100;
   boostInput.style.setProperty('--fill', `${percentage}%`);
 
@@ -80,7 +80,7 @@ function render() {
 
 async function applyState() {
   try {
-    const [tab] = await queryTabs({ active: true, currentWindow: true });
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     if (!tab?.id) {
       statusText.textContent = "No active tab";
@@ -100,105 +100,37 @@ async function applyState() {
   }
 }
 
-function sendTabMessage(tabId, nextState) {
-  return new Promise((resolve, reject) => {
-    const result = chrome.tabs.sendMessage(
-      tabId,
-      {
-        type: "VOLUME_BOOSTER_SET",
-        state: nextState
-      },
-      (response) => {
-        const error = chrome.runtime.lastError;
-        if (error) {
-          reject(error);
-          return;
-        }
-
-        resolve(response);
-      }
-    );
-
-    if (result && typeof result.then === "function") {
-      result.then(resolve).catch(reject);
+async function sendTabMessage(tabId, nextState) {
+  return await chrome.tabs.sendMessage(
+    tabId,
+    {
+      type: "VOLUME_BOOSTER_SET",
+      state: nextState
     }
-  });
+  );
 }
 
-function injectContentScript(tabId) {
+async function injectContentScript(tabId) {
   if (chrome.scripting?.executeScript) {
-    return new Promise((resolve, reject) => {
-      const result = chrome.scripting.executeScript(
-        {
-          target: {
-            tabId,
-            allFrames: true
-          },
-          files: ["content.js"]
-        },
-        () => {
-          const error = chrome.runtime.lastError;
-          if (error) {
-            reject(error);
-            return;
-          }
-
-          resolve();
-        }
-      );
-
-      if (result && typeof result.then === "function") {
-        result.then(resolve).catch(reject);
-      }
+    await chrome.scripting.executeScript({
+      target: {
+        tabId,
+        allFrames: true
+      },
+      files: ["content.js"]
     });
+    return;
   }
 
-  return Promise.reject(new Error("Script injection is unavailable"));
+  throw new Error("Script injection is unavailable");
 }
 
-function queryTabs(query) {
-  return new Promise((resolve, reject) => {
-    const result = chrome.tabs.query(query, (tabs) => {
-      const error = chrome.runtime.lastError;
-      if (error) {
-        reject(error);
-        return;
-      }
-
-      resolve(tabs);
-    });
-
-    if (result && typeof result.then === "function") {
-      result.then(resolve).catch(reject);
-    }
-  });
+async function getStorage(defaults) {
+  return await chrome.storage.sync.get(defaults);
 }
 
-function getStorage(defaults) {
-  return new Promise((resolve) => {
-    const result = chrome.storage.sync.get(defaults, resolve);
-    if (result && typeof result.then === "function") {
-      result.then(resolve);
-    }
-  });
-}
-
-function setStorage(nextState) {
-  return new Promise((resolve, reject) => {
-    const result = chrome.storage.sync.set(nextState, () => {
-      const error = chrome.runtime.lastError;
-      if (error) {
-        reject(error);
-        return;
-      }
-
-      resolve();
-    });
-
-    if (result && typeof result.then === "function") {
-      result.then(resolve).catch(reject);
-    }
-  });
+async function setStorage(nextState) {
+  await chrome.storage.sync.set(nextState);
 }
 
 function getErrorMessage(error) {
